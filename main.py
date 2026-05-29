@@ -96,5 +96,3 @@ def crear_diccionario(libros):
     for palabras in libros.values():
         vocabulario.update(palabras)
     return sorted(vocabulario)
-
-
