@@ -4,6 +4,7 @@ import requests
 
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
+from concurrent.futures import ThreadPoolExecutor
 
 # Lista de stopwords en inglés
 stop_words = set(stopwords.words("english"))
@@ -153,7 +154,7 @@ def download_file(url, name, directory):
     # Abre el archivo en modo escritura binaria
     with open(name, mode='wb') as file:
         # Descarga el archivo por bloques
-        for chunk in response.iter_content(chunk_size=10 * 1024):
+        for chunk in response.iter_content(chunk_size=256 * 1024):
             file.write(chunk)
 
     print(f"Downloaded file: {name}")
@@ -162,12 +163,19 @@ def store_files(links, names, directory='./'):
     """Guarda cada liga de la lista de ligas `links` en la computadora
     utilizando el directorio deseado y cada uno de los nombres en names.
     """
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = [
+            executor.submit(download_file, url, name, directory)
+            for url, name in zip(links, names)
+        ]
 
-    # Recorre links y nombres al mismo tiempo
-    for url, name in zip(links, names):
+        for future in futures:
 
-        # Descarga cada libro
-        download_file(url,name,directory)
+            try:
+                future.result()
+
+            except Exception as e:
+                print("Error:", e)
 
 
 def main(n=-1, directory='./'):
