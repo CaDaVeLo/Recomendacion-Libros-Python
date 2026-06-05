@@ -73,6 +73,8 @@ def main(n=-1, directory='./'):
 
     print("\nLIBROS PROCESADOS\n")
 
+    diccionario_global = {}
+
     # Recorre cada archivo descargado
     for archivo in os.listdir(directory):
 
@@ -87,6 +89,12 @@ def main(n=-1, directory='./'):
 
         print(archivo, "->", len(tokens), "tokens")
 
+        # Acumula frecuencias en el diccionario global
+        for token in tokens:
+            diccionario_global[token] = diccionario_global.get(token, 0) + 1
+
+    print("\nDiccionario global:")
+    print(diccionario_global)
     print("\nDone")
 
 
