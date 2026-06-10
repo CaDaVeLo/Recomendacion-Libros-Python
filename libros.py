@@ -3,7 +3,7 @@ from string import punctuation
 
 
 class Libro:
-    def __init__(self, name, filename) -> None:
+    def __init__(self, name: str, filename: str) -> None:
         """Crear atributos públicos """
         self.name = name
         self.filename = filename
@@ -27,7 +27,7 @@ class Libro:
         #     """Checar que el nombre sea un string y que el archivo existe"""
         #     ...
 
-    def _limpiar_linea(self, linea):
+    def _limpiar_linea(self, linea: str) -> str:
         """Este método toma una línea de texto (str) y elimina los caracteres
         en `self.CARACTERES_ESPECIALES`.
 
@@ -36,7 +36,7 @@ class Libro:
             linea = linea.replace(char, ' ')
         return linea
 
-    def _limpiar_tokens(self, tokens):
+    def _limpiar_tokens(self, tokens: list[str]) -> list[str]:
         """Este método recibe una lista de palabras (`tokens`) y elimina
         aquellas que se encuentran en `self.STOPWORDS` modificando la lista
         original. (regresa lista de palabras sin stopwords)
@@ -45,7 +45,7 @@ class Libro:
         tokens[:] = [t for t in tokens if t not in self.STOPWORDS]
         return tokens
 
-    def _preprocesar_linea(self, linea) -> list[str]:
+    def _preprocesar_linea(self, linea: str) -> list[str]:
         """Limpia una línea de texto regresando tokens  limpios. La limpieza
         debe considerar eliminar espacios blancos al principio y final de la
         línea, convertir a minúsculas, eliminar caracteres especiales, crear
@@ -163,7 +163,7 @@ class LibroGutenberg(Libro):
 
 # Los libros en distintos idiomas tienen distintos `STOPWORDS`.
 class LibroEnglish(LibroGutenberg):
-    def __init__(self, name, filename) -> None:
+    def __init__(self, name: str, filename: str) -> None:
         super().__init__(name, filename)
         # Agregar aquí los STOPWORDS en ingles (utiliza nltk).
         # (No ocupas hacer nada más que eso)
@@ -171,7 +171,7 @@ class LibroEnglish(LibroGutenberg):
         self.STOPWORDS = set(stopwords.words('english'))
 
 class LibroSpanish(LibroGutenberg):
-    def __init__(self, name, filename) -> None:
+    def __init__(self, name: str, filename: str) -> None:
         super().__init__(name, filename)
         # Agregar aquí los STOPWORDS en español (utiliza nltk).
         # (No ocupas hacer nada más que eso)
@@ -179,7 +179,7 @@ class LibroSpanish(LibroGutenberg):
         self.STOPWORDS = set(stopwords.words('spanish'))
 
 class LibroFrench(LibroGutenberg):
-    def __init__(self, name, filename) -> None:
+    def __init__(self, name: str, filename: str) -> None:
         super().__init__(name, filename)
         # Agregar aquí los STOPWORDS en francés (utiliza nltk).
         # (No ocupas hacer nada más que eso)
@@ -188,7 +188,7 @@ class LibroFrench(LibroGutenberg):
 
 # La siguiente función asume que todos los libros se encuentran en el
 # directorio `directory`, tienen extensión `txt` y todos son en inglés.
-def crear_lista_libros_ingles(directory: str, caract_especiales=punctuation):
+def crear_lista_libros_ingles(directory: str, caract_especiales: str = punctuation) -> list[LibroEnglish]:
     """Crea una lista de instancias `LibroEnglish` a partir de libros
     localizados en `directory`.
 
