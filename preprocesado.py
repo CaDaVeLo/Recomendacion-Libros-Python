@@ -1,4 +1,4 @@
-def limpiar_linea(linea, caracteres_especiales):
+def limpiar_linea(linea: str, caracteres_especiales: str | list[str]) -> str:
     """Esta función toma una línea de texto (str) y un iterable de caracteres
     especiales y regresa la línea sin dichos caracteres (.,?!*/).
 
@@ -7,7 +7,7 @@ def limpiar_linea(linea, caracteres_especiales):
         linea = linea.replace(char, ' ')
     return linea
 
-def limpiar_tokens(tokens, stopwords):
+def limpiar_tokens(tokens: list[str], stopwords: set[str]) -> list[str]:
     """Esta función recibe una lista de palabras (`tokens`) y elimina aquellas
     que se encuentren en  el iterable `stopwords` modificando la lista original.
     (regresa lista de palabras sin stopwords)
@@ -16,7 +16,7 @@ def limpiar_tokens(tokens, stopwords):
     tokens[:] = [t for t in tokens if t not in stopwords]
     return tokens
 
-def preprocesar_linea(linea, caracteres_especiales, stopwords) -> list[str]:
+def preprocesar_linea(linea: str, caracteres_especiales: str | list[str], stopwords: set[str]) -> list[str]:
     """Limpia una línea de texto regresando tokens  limpios. La limpieza debe
     considerar eliminar espacios blancos al principio y final de la línea,
     convertir a minúsculas, eliminar caracteres especiales, crear tokens y
@@ -42,7 +42,7 @@ def preprocesar_linea(linea, caracteres_especiales, stopwords) -> list[str]:
     limpiar_tokens(tokens, stopwords)
     return tokens
 
-def leer_libro(filename) -> list[str]:
+def leer_libro(filename: str) -> list[str]:
     """Dado el nombre de un archivo debe leer cada línea, agregando aquellas
     que no esten vacías a una lista, es decir, debe regresar una lista cuyos
     elementos son las líneas no vacías del libro (el primer elemento es la
@@ -57,7 +57,7 @@ def leer_libro(filename) -> list[str]:
     return lineas
 
 def preprocesar_libro(
-    libro: list[str], caracteres_especiales, stopwords
+    libro: list[str], caracteres_especiales: str | list[str], stopwords: set[str]
 ) -> dict[str, int]:
     """Regresa un diccionario de palabras relevantes del libro como llaves
     (los tokens limpios) y sus respectivas frecuencias como valores. Por
