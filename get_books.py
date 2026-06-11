@@ -85,7 +85,7 @@ def get_links(n: int | list[int] = -1) -> tuple[ list[str], list[str] ]:
         print("wrong url for Gutenberg project")
         return [], []
 
-def download_file(url, name, directory):
+def download_file(url: str, name: str, directory: str) -> None:
     """Guarda un archivo que se encuentra en un `url` bajo el nombre que demos
     en `name` en el directorio deseado.
     """
@@ -96,7 +96,7 @@ def download_file(url, name, directory):
             file.write(chunk)
     print(f"Downloaded file: {name}")
 
-def store_files(links, names, directory='./'):
+def store_files(links: list[str], names: list[str], directory: str = './') -> None:
     """Guarda cada liga de la lista de ligas `links` en la computadora
     utilizando el directorio deseado y cada uno de los nombres en names.
     """
@@ -111,7 +111,7 @@ def store_files(links, names, directory='./'):
             except Exception as e:
                 print("Error:", e)
 
-def main(n = -1, directory='./'):
+def main(n: int | list[int] | range = -1, directory: str = './') -> None:
     os.makedirs(directory, exist_ok=True)
     links, titles = get_links(n)
     store_files(links, titles, directory)

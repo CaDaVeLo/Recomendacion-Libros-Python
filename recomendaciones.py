@@ -1,8 +1,9 @@
 import math
+from libros import Libro
 
 
 class Recomendador:
-    def __init__(self, libros) -> None:
+    def __init__(self, libros: list[Libro]) -> None:
         """
         libros: lista con instancias de tipo `Libro`
         """
@@ -38,7 +39,7 @@ class Recomendador:
                 pesos_libro[word] = tf * idf[word]
             self._pesos.append(pesos_libro)
 
-    def get_pesos(self):
+    def get_pesos(self) -> list[dict[str, float]] | None:
         """Regresa los pesos calculados"""
         return self._pesos
 
@@ -48,7 +49,7 @@ class Recomendador:
         pesos_2 = self._pesos[idx_2]
         return sum(pesos_1.get(word, 0) * pesos_2.get(word, 0) for word in pesos_1)
 
-    def _similitud(self, idx_1, idx_2) -> float:
+    def _similitud(self, idx_1: int, idx_2: int) -> float:
         """Similitud entre los libros con índices idx_1 y idx_2 de acuerdo a l
         cosene del ángulo que forman sus vectores.
 
@@ -60,7 +61,7 @@ class Recomendador:
             return 0.0
         return dot / (norm_1 * norm_2)
 
-    def mostrar_libros(self):
+    def mostrar_libros(self) -> None:
         """Mostrarle al usuario el índice y nombre para cada libro de acuerdo a
         nuestra lista de libros `self.libros`.
 
@@ -68,7 +69,7 @@ class Recomendador:
         for i, libro in enumerate(self.libros):
             print(f"  {i}: {libro.name}")
 
-    def resumen(self, idx_libro, num_palabras) -> list[str]:
+    def resumen(self, idx_libro: int, num_palabras: int) -> list[str]:
         """Regresa una lista con las palabras más representativas de un libro
         de acuerdo a los pesos.
 
@@ -80,7 +81,7 @@ class Recomendador:
         sorted_words = sorted(pesos.items(), key=lambda x: x[1], reverse=True)
         return [word for word, _ in sorted_words[:num_palabras]]
 
-    def libros_similares(self, idx_libro, num_libros) -> list[str]:
+    def libros_similares(self, idx_libro: int, num_libros: int) -> list[str]:
         """Regresa una lista con los libros más parecidos a un libro dado.
 
         idx_libro: índice del libro a partir del cual quiero recomendaciones.

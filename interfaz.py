@@ -50,31 +50,36 @@ print("-" * 40)
 rec.mostrar_libros()
 print("-" * 40)
 
-# Preguntar qué desea hacer
-print("\n¿Qué deseas hacer?")
-print("  1. Ver resumen de un libro (palabras más representativas)")
-print("  2. Obtener recomendaciones de libros similares")
+while True:
+    print("\n¿Qué deseas hacer?")
+    print("  1. Ver resumen de un libro (palabras más representativas)")
+    print("  2. Obtener recomendaciones de libros similares")
+    print("  3. Salir")
 
-opcion = input("\nElige una opción (1 o 2): ").strip()
+    opcion = input("\nElige una opción (1, 2 o 3): ").strip()
 
-if opcion == "1":
-    idx = int(input("Ingresa el índice del libro: "))
-    num = int(input("¿Cuántas palabras deseas en el resumen?: "))
-    palabras = rec.resumen(idx, num)
-    print(f"\nResumen del libro '{lista_libros[idx].name}':")
-    print("=" * 50)
-    print("  " + ", ".join(palabras))
-    print("=" * 50)
+    if opcion == "1":
+        idx = int(input("Ingresa el índice del libro: "))
+        num = int(input("¿Cuántas palabras deseas en el resumen?: "))
+        palabras = rec.resumen(idx, num)
+        print(f"\nResumen del libro '{lista_libros[idx].name}':")
+        print("=" * 50)
+        print("  " + ", ".join(palabras))
+        print("=" * 50)
 
-elif opcion == "2":
-    idx = int(input("Ingresa el índice del libro que te gustó: "))
-    num = int(input("¿Cuántos libros quieres que te recomiende?: "))
-    recomendados = rec.libros_similares(idx, num)
-    print(f"\nBasado en '{lista_libros[idx].name}', te recomendamos:")
-    print("=" * 50)
-    for i, nombre in enumerate(recomendados, 1):
-        print(f"  {i}. {nombre}")
-    print("=" * 50)
+    elif opcion == "2":
+        idx = int(input("Ingresa el índice del libro que te gustó: "))
+        num = int(input("¿Cuántos libros quieres que te recomiende?: "))
+        recomendados = rec.libros_similares(idx, num)
+        print(f"\nBasado en '{lista_libros[idx].name}', te recomendamos:")
+        print("=" * 50)
+        for i, nombre in enumerate(recomendados, 1):
+            print(f"  {i}. {nombre}")
+        print("=" * 50)
 
-else:
-    print("Opción no válida. Por favor elige 1 o 2.")
+    elif opcion == "3":
+        print("\n¡Hasta luego!")
+        break
+
+    else:
+        print("Opción no válida. Por favor elige 1, 2 o 3.")
