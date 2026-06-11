@@ -9,23 +9,28 @@ class Libro:
         self.filename = filename
         self.CARACTERES_ESPECIALES: str | None = None
         self.STOPWORDS: list[str] | None = None
-        # hacer que estos atributos sean de tipo property (al setter hay que
-        # incluirle validación)
-        # @property
-        # def name(self):
-        #    ...
-        # @name.setter
-        # def name(self, value):
-        #     """Checar que el nombre sea un string"""
-        #     ...
 
-        # @property
-        # def filename(self):
-        #    ...
-        # @filename.setter
-        # def filename(self, value):
-        #     """Checar que el nombre sea un string y que el archivo existe"""
-        #     ...
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, value: str) -> None:
+        if not isinstance(value, str):
+            raise TypeError(f"El nombre debe ser un string, se recibió {type(value).__name__}")
+        self._name = value
+
+    @property
+    def filename(self) -> str:
+        return self._filename
+
+    @filename.setter
+    def filename(self, value: str) -> None:
+        if not isinstance(value, str):
+            raise TypeError(f"El filename debe ser un string, se recibió {type(value).__name__}")
+        if not Path(value).exists():
+            raise FileNotFoundError(f"El archivo '{value}' no existe")
+        self._filename = value
 
     def _limpiar_linea(self, linea: str) -> str:
         """Este método toma una línea de texto (str) y elimina los caracteres
