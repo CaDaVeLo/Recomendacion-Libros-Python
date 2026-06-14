@@ -39,6 +39,8 @@ class Libro:
         """
         for char in self.CARACTERES_ESPECIALES:
             linea = linea.replace(char, ' ')
+        # Elimina caracteres no-alfabéticos Unicode (comillas tipográficas, guiones, etc.)
+        linea = ''.join(c if c.isalpha() or c.isspace() else ' ' for c in linea)
         return linea
 
     def _limpiar_tokens(self, tokens: list[str]) -> list[str]:
@@ -168,12 +170,22 @@ class LibroGutenberg(Libro):
 
 # Los libros en distintos idiomas tienen distintos `STOPWORDS`.
 class LibroEnglish(LibroGutenberg):
+    # Palabras comunes no cubiertas por la lista base de NLTK
+    _EXTRA_EN = {
+        'one', 'yet', 'upon', 'also', 'may', 'might', 'must', 'shall',
+        'would', 'could', 'even', 'still', 'though', 'however', 'thus',
+        'indeed', 'perhaps', 'whether', 'without', 'every', 'much', 'many',
+        'well', 'us', 'mr', 'mrs', 'said', 'unto', 'thy', 'thou', 'thee',
+        'hath', 'ye', 'doth', 'whose', 'whilst', 'among', 'therefore',
+        'hence', 'wherefore', 'thereof', 'hereby', 'thereby', 'wherein',
+    }
+
     def __init__(self, name: str, filename: str) -> None:
         super().__init__(name, filename)
         # Agregar aquí los STOPWORDS en ingles (utiliza nltk).
         # (No ocupas hacer nada más que eso)
         from nltk.corpus import stopwords
-        self.STOPWORDS = set(stopwords.words('english'))
+        self.STOPWORDS = set(stopwords.words('english')) | self._EXTRA_EN
 
 class LibroSpanish(LibroGutenberg):
     def __init__(self, name: str, filename: str) -> None:

@@ -15,28 +15,23 @@ class Recomendador:
         recomendaciones y los guarda en `self._pesos`
 
         """
-        freq_dicts = [libro.preprocesar_libro() for libro in self.libros]
         N = len(self.libros)
+        freq_dicts = [libro.preprocesar_libro() for libro in self.libros]
 
-        # Obtener todas las palabras únicas entre todos los libros
-        all_words = set()
+        # Frecuencia de documento: cuántos libros contienen cada palabra
+        df = {}
         for freq in freq_dicts:
-            all_words.update(freq.keys())
+            for word in freq:
+                df[word] = df.get(word, 0) + 1
 
-        # Calcular IDF para cada palabra
-        idf = {}
-        for word in all_words:
-            df = sum(1 for freq in freq_dicts if word in freq)
-            idf[word] = math.log(N / (1 + df))
-
-        # Calcular TF-IDF para cada libro
+        # W(i,j) = TF(i,j) * ln(1 + N / DF(i))
         self._pesos = []
         for freq in freq_dicts:
             total = sum(freq.values()) or 1
-            pesos_libro = {}
-            for word, count in freq.items():
-                tf = count / total
-                pesos_libro[word] = tf * idf[word]
+            pesos_libro = {
+                word: (count / total) * math.log(1 + N / df[word])
+                for word, count in freq.items()
+            }
             self._pesos.append(pesos_libro)
 
     def get_pesos(self) -> list[dict[str, float]] | None:
