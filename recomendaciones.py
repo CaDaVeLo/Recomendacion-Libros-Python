@@ -137,13 +137,17 @@ class Recomendador:
         idx_libro : int
             Índice del libro de referencia en ``self.libros``.
         num_libros : int
-            Número de recomendaciones a devolver.
+            Número de recomendaciones a devolver. Si excede el total de
+            libros disponibles (excluyendo el libro de referencia), se
+            devuelven todos los disponibles.
 
         Returns
         -------
         list[str]
-            Lista con los nombres de los ``num_libros`` libros más similares.
+            Lista con los nombres de los ``num_libros`` libros más similares,
+            sin incluir el libro de referencia.
         """
+        num_libros = min(num_libros, len(self.libros) - 1)
         similitudes = []
         for i in range(len(self.libros)):
             if i != idx_libro:
