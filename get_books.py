@@ -86,8 +86,20 @@ def get_links(n: int | list[int] = -1) -> tuple[ list[str], list[str] ]:
         return [], []
 
 def download_file(url: str, name: str, directory: str) -> None:
-    """Guarda un archivo que se encuentra en un `url` bajo el nombre que demos
-    en `name` en el directorio deseado.
+    """Descarga un archivo desde una URL y lo guarda en el directorio indicado.
+
+    Parameters
+    ----------
+    url : str
+        URL del archivo a descargar.
+    name : str
+        Nombre con el que se guardará el archivo.
+    directory : str
+        Ruta del directorio donde se guardará el archivo.
+
+    Returns
+    -------
+    None
     """
     response = requests.get(url, stream=True)
     name = os.path.join(directory, name)
@@ -97,8 +109,22 @@ def download_file(url: str, name: str, directory: str) -> None:
     print(f"Downloaded file: {name}")
 
 def store_files(links: list[str], names: list[str], directory: str = './') -> None:
-    """Guarda cada liga de la lista de ligas `links` en la computadora
-    utilizando el directorio deseado y cada uno de los nombres en names.
+    """Descarga en paralelo los archivos de la lista de URLs y los guarda con
+    sus respectivos nombres en el directorio indicado.
+
+    Parameters
+    ----------
+    links : list[str]
+        Lista de URLs de los archivos a descargar.
+    names : list[str]
+        Lista de nombres con los que se guardarán los archivos,
+        en el mismo orden que `links`.
+    directory : str, optional
+        Ruta del directorio donde se guardarán los archivos (default './').
+
+    Returns
+    -------
+    None
     """
     with ThreadPoolExecutor(max_workers=5) as executor:
         futures = [

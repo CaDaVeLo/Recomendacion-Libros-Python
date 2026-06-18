@@ -4,7 +4,15 @@ from string import punctuation
 
 class Libro:
     def __init__(self, name: str, filename: str) -> None:
-        """Crear atributos públicos """
+        """Inicializa un libro con su nombre y ruta de archivo.
+
+        Parameters
+        ----------
+        name : str
+            Nombre del libro.
+        filename : str
+            Ruta al archivo de texto del libro.
+        """
         self.name = name
         self.filename = filename
         self.CARACTERES_ESPECIALES: str | None = None
@@ -33,32 +41,59 @@ class Libro:
         self._filename = value
 
     def _limpiar_linea(self, linea: str) -> str:
-        """Este método toma una línea de texto (str) y elimina los caracteres
-        en `self.CARACTERES_ESPECIALES`.
+        """Elimina los caracteres especiales de una línea de texto.
 
+        Sustituye cada carácter en ``self.CARACTERES_ESPECIALES`` por un
+        espacio y elimina cualquier carácter no-alfabético Unicode.
+
+        Parameters
+        ----------
+        linea : str
+            Línea de texto a limpiar.
+
+        Returns
+        -------
+        str
+            Línea de texto sin caracteres especiales.
         """
         for char in self.CARACTERES_ESPECIALES:
             linea = linea.replace(char, ' ')
+        # Elimina caracteres no-alfabéticos Unicode (comillas tipográficas, guiones, etc.)
+        linea = ''.join(c if c.isalpha() or c.isspace() else ' ' for c in linea)
         return linea
 
     def _limpiar_tokens(self, tokens: list[str]) -> list[str]:
-        """Este método recibe una lista de palabras (`tokens`) y elimina
-        aquellas que se encuentran en `self.STOPWORDS` modificando la lista
-        original. (regresa lista de palabras sin stopwords)
+        """Elimina las stopwords de una lista de tokens, modificando la lista
+        original.
 
+        Parameters
+        ----------
+        tokens : list[str]
+            Lista de palabras a filtrar.
+
+        Returns
+        -------
+        list[str]
+            Lista de tokens sin stopwords.
         """
         tokens[:] = [t for t in tokens if t not in self.STOPWORDS]
         return tokens
 
     def _preprocesar_linea(self, linea: str) -> list[str]:
-        """Limpia una línea de texto regresando tokens  limpios. La limpieza
-        debe considerar eliminar espacios blancos al principio y final de la
-        línea, convertir a minúsculas, eliminar caracteres especiales, crear
-        tokens y eliminar stopwords en estos tokens.
+        """Aplica el pipeline completo de limpieza a una línea de texto.
 
-        Este método debe aplicar los métodos anteriores donde sea necesario.
-        Debe regresar tokens limpios (lista de strings).
+        Elimina espacios al inicio y al final, convierte a minúsculas, elimina
+        caracteres especiales, tokeniza y descarta stopwords.
 
+        Parameters
+        ----------
+        linea : str
+            Línea de texto a preprocesar.
+
+        Returns
+        -------
+        list[str]
+            Lista de tokens limpios.
         """
         # eliminar espacios blancos al principio y final de la línea
         linea = linea.strip()
@@ -77,11 +112,12 @@ class Libro:
         return tokens
 
     def leer_libro(self) -> list[str]:
-        """Lee cada línea del libro en `self.filename`, agregando aquellas que
-        no esten vacías a una lista, es decir, debe regresar una lista cuyos
-        elementos son las líneas no vacías del libro (el primer elemento es la
-        primer línea no vacía y así sucesivamente).
+        """Lee el archivo del libro y devuelve sus líneas no vacías.
 
+        Returns
+        -------
+        list[str]
+            Lista de líneas no vacías del libro, en el orden original.
         """
         lineas = []
         with open(self.filename, encoding='utf-8', errors='ignore') as f:
@@ -91,16 +127,17 @@ class Libro:
         return lineas
 
     def preprocesar_libro(self) -> dict[str, int]:
-        """Regresa un diccionario de palabras relevantes del libro como llaves
-        (los tokens limpios) y sus respectivas frecuencias como valores. Por
-        ejemplo, puede regresar:
-            {'shrek': 55, 'fiona': 43, 'caminando': 8}
+        """Construye un diccionario de frecuencias de palabras relevantes del
+        libro.
 
-        Para hacer esto, aplica `preprocesar_linea` a cada linea del `libro`
-        agregando cada token limpio con un valor de 1 al diccionario si la
-        palabra no existe o aumentado el contador de la palabra correspondiente
-        en caso contrario.
+        Lee el libro, aplica el preprocesamiento a cada línea y cuenta las
+        ocurrencias de cada token limpio.
 
+        Returns
+        -------
+        dict[str, int]
+            Diccionario con tokens limpios como llaves y sus frecuencias como
+            valores.
         """
         diccionario = {}
         for linea in self.leer_libro():
@@ -110,31 +147,22 @@ class Libro:
         return diccionario
 
     def __str__(self) -> str:
-        """Regresa la representación de este objeto en forma de un string.
+        """Devuelve la representación informal del libro para el usuario.
 
-        Esta es una representación informal que tiene como objetivo que el
-        objeto sea entendible para el usuario cuando utilizamos `print` (esta
-        función se ejecuta cuando utilizamos ese comando).
-
-        Ver archivo: `Codes/clase_grupo.py` para un ejemplo.
-
-        O bien puedes ver:
-          https://realpython.com/python-classes/#special-methods-and-protocols
-
+        Returns
+        -------
+        str
+            Cadena con el nombre del libro en formato legible.
         """
         return f"Libro: {self.name}"
 
     def __repr__(self) -> str:
-        """Regresa la representación formal del objeto.
+        """Devuelve la representación formal del objeto, reproducible en código.
 
-        En esta función regresamos un string que tome la forma en la que
-        creariamos esta instancia.
-
-        Ver archivo: `Codes/clase_grupo.py` para un ejemplo.
-
-        O bien puedes ver:
-          https://realpython.com/python-classes/#special-methods-and-protocols
-
+        Returns
+        -------
+        str
+            Cadena que muestra cómo recrear esta instancia.
         """
         return f"Libro(name={self.name!r}, filename={self.filename!r})"
 
@@ -145,13 +173,14 @@ class Libro:
 # método copprespondiente.
 class LibroGutenberg(Libro):
     def leer_libro(self) -> list[str]:
-        """Lee cada línea del libro en `self.filename`, agregando aquellas que
-        no esten vacías a una lista. Además, empieza a agregar solo despues de
-        la línea que comienza con `*** START` y antes de la línea `*** END`.
+        """Lee el archivo del libro devolviendo solo las líneas entre las
+        marcas ``*** START`` y ``*** END`` del Proyecto Gutenberg.
 
-        (Debe regresar una lista cuyos elementos son las líneas no vacías del
-        libro que se encuentran entre las líneas `*** START` y `*** END`.)
-
+        Returns
+        -------
+        list[str]
+            Lista de líneas no vacías del contenido del libro, excluyendo
+            el encabezado y pie de página de Gutenberg.
         """
         lineas = []
         dentro = False
@@ -168,15 +197,43 @@ class LibroGutenberg(Libro):
 
 # Los libros en distintos idiomas tienen distintos `STOPWORDS`.
 class LibroEnglish(LibroGutenberg):
+    # Palabras comunes no cubiertas por la lista base de NLTK
+    _EXTRA_EN = {
+        'one', 'yet', 'upon', 'also', 'may', 'might', 'must', 'shall',
+        'would', 'could', 'even', 'still', 'though', 'however', 'thus',
+        'indeed', 'perhaps', 'whether', 'without', 'every', 'much', 'many',
+        'well', 'us', 'mr', 'mrs', 'said', 'unto', 'thy', 'thou', 'thee',
+        'hath', 'ye', 'doth', 'whose', 'whilst', 'among', 'therefore',
+        'hence', 'wherefore', 'thereof', 'hereby', 'thereby', 'wherein',
+    }
+
     def __init__(self, name: str, filename: str) -> None:
+        """Inicializa el libro cargando las stopwords en inglés con NLTK.
+
+        Parameters
+        ----------
+        name : str
+            Nombre del libro.
+        filename : str
+            Ruta al archivo de texto del libro.
+        """
         super().__init__(name, filename)
         # Agregar aquí los STOPWORDS en ingles (utiliza nltk).
         # (No ocupas hacer nada más que eso)
         from nltk.corpus import stopwords
-        self.STOPWORDS = set(stopwords.words('english'))
+        self.STOPWORDS = set(stopwords.words('english')) | self._EXTRA_EN
 
 class LibroSpanish(LibroGutenberg):
     def __init__(self, name: str, filename: str) -> None:
+        """Inicializa el libro cargando las stopwords en español con NLTK.
+
+        Parameters
+        ----------
+        name : str
+            Nombre del libro.
+        filename : str
+            Ruta al archivo de texto del libro.
+        """
         super().__init__(name, filename)
         # Agregar aquí los STOPWORDS en español (utiliza nltk).
         # (No ocupas hacer nada más que eso)
@@ -185,6 +242,15 @@ class LibroSpanish(LibroGutenberg):
 
 class LibroFrench(LibroGutenberg):
     def __init__(self, name: str, filename: str) -> None:
+        """Inicializa el libro cargando las stopwords en francés con NLTK.
+
+        Parameters
+        ----------
+        name : str
+            Nombre del libro.
+        filename : str
+            Ruta al archivo de texto del libro.
+        """
         super().__init__(name, filename)
         # Agregar aquí los STOPWORDS en francés (utiliza nltk).
         # (No ocupas hacer nada más que eso)
@@ -194,11 +260,22 @@ class LibroFrench(LibroGutenberg):
 # La siguiente función asume que todos los libros se encuentran en el
 # directorio `directory`, tienen extensión `txt` y todos son en inglés.
 def crear_lista_libros_ingles(directory: str, caract_especiales: str = punctuation) -> list[LibroEnglish]:
-    """Crea una lista de instancias `LibroEnglish` a partir de libros
-    localizados en `directory`.
+    """Crea una lista de instancias ``LibroEnglish`` a partir de los archivos
+    .txt encontrados en un directorio.
 
-    No ocupas modificar esta función, se encuentra ya implementada.
+    Parameters
+    ----------
+    directory : str
+        Ruta al directorio que contiene los archivos de texto.
+    caract_especiales : str, optional
+        Caracteres especiales a eliminar durante el preprocesamiento
+        (default: ``string.punctuation``).
 
+    Returns
+    -------
+    list[LibroEnglish]
+        Lista con una instancia de ``LibroEnglish`` por cada archivo .txt
+        encontrado en `directory`.
     """
     libros = []
     path = Path(directory)
