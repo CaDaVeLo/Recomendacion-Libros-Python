@@ -4,16 +4,27 @@ from libros import Libro
 
 class Recomendador:
     def __init__(self, libros: list[Libro]) -> None:
-        """
-        libros: lista con instancias de tipo `Libro`
+        """Inicializa el recomendador con una colección de libros.
+
+        Parameters
+        ----------
+        libros : list[Libro]
+            Lista de instancias de tipo ``Libro`` sobre las que se calcularán
+            las recomendaciones.
         """
         self.libros = libros
         self._pesos = None  # Se calcularan con un setter (ver `set_pesos`)
 
     def set_pesos(self) -> None:
-        """Calcula los pesos del algorítmo TF-IDF requeridos para las
-        recomendaciones y los guarda en `self._pesos`
+        """Calcula y almacena los pesos TF-IDF para todos los libros de la
+        colección.
 
+        El peso de cada palabra en un libro se calcula como:
+            W(i,j) = TF(i,j) * ln(1 + N / DF(i))
+
+        Returns
+        -------
+        None
         """
         N = len(self.libros)
         freq_dicts = [libro.preprocesar_libro() for libro in self.libros]
@@ -35,19 +46,50 @@ class Recomendador:
             self._pesos.append(pesos_libro)
 
     def get_pesos(self) -> list[dict[str, float]] | None:
-        """Regresa los pesos calculados"""
+        """Devuelve los pesos TF-IDF calculados por ``set_pesos``.
+
+        Returns
+        -------
+        list[dict[str, float]] | None
+            Lista de diccionarios con los pesos por libro, o ``None`` si
+            ``set_pesos`` no ha sido llamado.
+        """
         return self._pesos
 
-    def _producto_punto(self, idx_1:int, idx_2:int) -> float:
-        """Producto punto entre los libros con índices idx_1 y idx_2."""
+    def _producto_punto(self, idx_1: int, idx_2: int) -> float:
+        """Calcula el producto punto entre los vectores de pesos de dos libros.
+
+        Parameters
+        ----------
+        idx_1 : int
+            Índice del primer libro en ``self.libros``.
+        idx_2 : int
+            Índice del segundo libro en ``self.libros``.
+
+        Returns
+        -------
+        float
+            Producto punto entre los vectores TF-IDF de los dos libros.
+        """
         pesos_1 = self._pesos[idx_1]
         pesos_2 = self._pesos[idx_2]
         return sum(pesos_1.get(word, 0) * pesos_2.get(word, 0) for word in pesos_1)
 
     def _similitud(self, idx_1: int, idx_2: int) -> float:
-        """Similitud entre los libros con índices idx_1 y idx_2 de acuerdo a l
-        cosene del ángulo que forman sus vectores.
+        """Calcula la similitud coseno entre dos libros.
 
+        Parameters
+        ----------
+        idx_1 : int
+            Índice del primer libro en ``self.libros``.
+        idx_2 : int
+            Índice del segundo libro en ``self.libros``.
+
+        Returns
+        -------
+        float
+            Similitud coseno entre los vectores TF-IDF de los dos libros,
+            en el rango [0, 1].
         """
         dot = self._producto_punto(idx_1, idx_2)
         norm_1 = math.sqrt(self._producto_punto(idx_1, idx_1))
@@ -57,32 +99,50 @@ class Recomendador:
         return dot / (norm_1 * norm_2)
 
     def mostrar_libros(self) -> None:
-        """Mostrarle al usuario el índice y nombre para cada libro de acuerdo a
-        nuestra lista de libros `self.libros`.
+        """Imprime el índice y nombre de cada libro de la colección.
 
+        Returns
+        -------
+        None
         """
         for i, libro in enumerate(self.libros):
             print(f"  {i}: {libro.name}")
 
     def resumen(self, idx_libro: int, num_palabras: int) -> list[str]:
-        """Regresa una lista con las palabras más representativas de un libro
-        de acuerdo a los pesos.
+        """Devuelve las palabras más representativas de un libro según sus
+        pesos TF-IDF.
 
-        idx_libro: índice del libro cuyo resumen deseamos.
-        num_palabras: número de palabras en el resumen.
+        Parameters
+        ----------
+        idx_libro : int
+            Índice del libro en ``self.libros``.
+        num_palabras : int
+            Número de palabras a incluir en el resumen.
 
+        Returns
+        -------
+        list[str]
+            Lista de las ``num_palabras`` palabras con mayor peso TF-IDF.
         """
         pesos = self._pesos[idx_libro]
         sorted_words = sorted(pesos.items(), key=lambda x: x[1], reverse=True)
         return [word for word, _ in sorted_words[:num_palabras]]
 
     def libros_similares(self, idx_libro: int, num_libros: int) -> list[str]:
-        """Regresa una lista con los libros más parecidos a un libro dado.
+        """Devuelve los libros más similares a uno dado, ordenados por
+        similitud coseno descendente.
 
-        idx_libro: índice del libro a partir del cual quiero recomendaciones.
-        num_libros: número de libros en mi recomendación.
+        Parameters
+        ----------
+        idx_libro : int
+            Índice del libro de referencia en ``self.libros``.
+        num_libros : int
+            Número de recomendaciones a devolver.
 
-
+        Returns
+        -------
+        list[str]
+            Lista con los nombres de los ``num_libros`` libros más similares.
         """
         similitudes = []
         for i in range(len(self.libros)):
